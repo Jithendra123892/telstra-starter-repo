@@ -1,6 +1,9 @@
 package com.telstra.sim;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class SimActivation {
@@ -10,17 +13,10 @@ public class SimActivation {
     private Long id;
 
     private String iccid;
+
     private String customerEmail;
-    private boolean activated;
 
-    // Constructors
-    public SimActivation() {}
-
-    public SimActivation(String iccid, String customerEmail, boolean activated) {
-        this.iccid = iccid;
-        this.customerEmail = customerEmail;
-        this.activated = activated;
-    }
+    private boolean active;
 
     // Getters and Setters
     public Long getId() {
@@ -43,11 +39,11 @@ public class SimActivation {
         this.customerEmail = customerEmail;
     }
 
-    public boolean isActivated() {
-        return activated;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setActivated(boolean activated) {
-        this.activated = activated;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

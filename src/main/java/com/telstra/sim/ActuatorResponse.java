@@ -1,21 +1,13 @@
 package com.telstra.sim;
 
 public class ActuatorResponse {
-    private boolean success;
+    private String status;
 
-    // Constructors
-    public ActuatorResponse() {}
-
-    public ActuatorResponse(boolean success) {
-        this.success = success;
+    public String getStatus() {
+        return status;
     }
 
-    // Getter and Setter
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

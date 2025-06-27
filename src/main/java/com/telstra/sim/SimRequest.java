@@ -1,18 +1,20 @@
 package com.telstra.sim;
 
 public class SimRequest {
+
+    private String simId;
     private String iccid;
     private String customerEmail;
 
-    // Constructors
-    public SimRequest() {}
-
-    public SimRequest(String iccid, String customerEmail) {
-        this.iccid = iccid;
-        this.customerEmail = customerEmail;
+    // Getters and Setters
+    public String getSimId() {
+        return simId;
     }
 
-    // Getters and Setters
+    public void setSimId(String simId) {
+        this.simId = simId;
+    }
+
     public String getIccid() {
         return iccid;
     }
