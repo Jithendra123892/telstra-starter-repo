@@ -1,41 +1,51 @@
 package com.telstra.sim;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/sim")
 public class SimActivationController {
 
-    @Autowired
-    private SimActivationService simActivationService;
+    private final RestTemplate restTemplate;
 
-    @Autowired
-    private SimActivationRepository simActivationRepository;
-
-    @PostMapping("/activate")
-    public String activateSim(@RequestBody SimRequest simRequest) {
-        return simActivationService.activateSim(simRequest);
+    public SimActivationController(RestTemplateBuilder builder) {
+        this.restTemplate = builder.build();
     }
 
-    @GetMapping("/query")
-    public ResponseEntity<?> getSimDetails(@RequestParam Long simCardId) {
-        Optional<SimActivation> sim = simActivationRepository.findById(simCardId);
-        if (sim.isPresent()) {
-            SimActivation simActivation = sim.get();
-            Map<String, Object> response = new HashMap<>();
-            response.put("iccid", simActivation.getIccid());
-            response.put("customerEmail", simActivation.getCustomerEmail());
-            response.put("active", simActivation.isActive());
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("SIM not found.");
+    @PostMapping("/activate")
+    public ResponseEntity<String> activateSim(@RequestBody SimRequest simRequest) {
+        String actuatorUrl = "http://localhost:8444/actuate";
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("iccid", simRequest.getIccid());
+
+        try {
+            ResponseEntity<ActuatorResponse> response = restTemplate.postForEntity(
+                    actuatorUrl,
+                    payload,
+                    ActuatorResponse.class
+            );
+
+            boolean success = response.getBody() != null && response.getBody().isSuccess();
+
+            if (success) {
+                System.out.println("Activation successful");
+                return ResponseEntity.ok("Activation successful");
+            } else {
+                System.out.println("Activation failed");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Activation failed");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error contacting actuator");
         }
     }
 }
