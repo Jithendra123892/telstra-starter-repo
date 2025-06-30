@@ -1,17 +1,42 @@
 package com.telstra.sim;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
-public class SimActivationService {
+ class SimActivationService {
 
-    public String activateSim(SimRequest request) {
-        if (request == null) {
-            return "Activation failed";
+    private final RestTemplate restTemplate;
+    private final SimActivationRepository simActivationRepository;
+
+     SimActivationService(RestTemplate restTemplate, SimActivationRepository simActivationRepository) {
+        this.restTemplate = restTemplate;
+        this.simActivationRepository = simActivationRepository;
+    }
+
+     SimActivation activateSim(SimRequest request) {
+        ActuatorResponse response = restTemplate.postForObject(
+                "http://localhost:8444/actuate",
+                request.getIccid(),
+                ActuatorResponse.class
+        );
+
+        String status = "FAILED";
+        String message = "No response from actuator service";
+
+        if (response != null) {
+            status = response.isSuccess() ? "SUCCESS" : "FAILURE";
+            message = response.getMessage();
         }
-        if (request.getIccid() == null || request.getCustomerEmail() == null) {
-            return "Activation failed";
-        }
-        return "Activation successful";
+
+        SimActivation activation = new SimActivation(
+                request.getIccid(),
+                request.getCustomerEmail(),
+                status,
+                message
+        );
+
+        simActivationRepository.save(activation);
+        return activation;
     }
 }

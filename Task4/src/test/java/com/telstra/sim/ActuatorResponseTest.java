@@ -1,15 +1,25 @@
 package com.telstra.sim;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ActuatorResponseTest {
+import org.junit.jupiter.api.Test;
+
+class ActuatorResponseTest {
 
     @Test
-    void testSetAndGetStatus() {
+    void testGettersSetters() {
         ActuatorResponse response = new ActuatorResponse();
-        response.setStatus("success");
+        response.setSuccess(true);
+        response.setMessage("msg");
 
-        assertEquals("success", response.getStatus());
+        assertTrue(response.isSuccess());
+        assertEquals("msg", response.getMessage());
+    }
+
+    @Test
+    void testConstructor() {
+        ActuatorResponse response = new ActuatorResponse(true, "msg");
+        assertTrue(response.isSuccess());
+        assertEquals("msg", response.getMessage());
     }
 }

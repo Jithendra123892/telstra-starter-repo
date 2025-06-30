@@ -1,13 +1,12 @@
 package com.telstra.sim;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-class TelstraApplicationTest {
+ class TelstraApplicationTest {
 
     @Test
-    void contextLoads() {
-        TelstraApplication.main(new String[]{});
+    void mainMethod_runsWithoutExceptions() {
+        assertDoesNotThrow(() -> TelstraApplication.main(new String[]{}));
     }
 }

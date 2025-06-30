@@ -1,50 +1,38 @@
 package com.telstra.sim;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
-public class SimActivation {
+@Table(name = "sim_activation")
+class SimActivation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String iccid;
+
+    @Column(nullable = false)
     private String customerEmail;
-    private String status;
 
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
+    @Column(nullable = false)
+    private String activationStatus;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(nullable = false)
+    private String activationMessage;
 
-    public String getIccid() {
-        return iccid;
-    }
+     SimActivation() { }
 
-    public void setIccid(String iccid) {
+    SimActivation(String iccid, String customerEmail, String activationStatus, String activationMessage) {
         this.iccid = iccid;
-    }
-
-    public String getCustomerEmail() {
-        return customerEmail;
-    }
-
-    public void setCustomerEmail(String customerEmail) {
         this.customerEmail = customerEmail;
+        this.activationStatus = activationStatus;
+        this.activationMessage = activationMessage;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    Long getId() { return id; }
+     String getIccid() { return iccid; }
+    String getCustomerEmail() { return customerEmail; }
+     String getActivationStatus() { return activationStatus; }
+    String getActivationMessage() { return activationMessage; }
 }

@@ -1,36 +1,59 @@
 package com.telstra.sim;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-@WebMvcTest(SimActivationController.class)
-public class SimActivationControllerTest {
+import java.util.Arrays;
+import java.util.List;
 
-    @Autowired
-    private MockMvc mockMvc;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-    @MockBean
-    private SimActivationService simActivationService;
+ class SimActivationControllerTest {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Mock
+    private SimActivationService service;
+
+    @Mock
+    private SimActivationRepository repository;
+
+    @InjectMocks
+    private SimActivationController controller;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
-    void activateSim_shouldReturnOk() throws Exception {
-        SimRequest request = new SimRequest();
-        request.setIccid("123456789");
-        request.setCustomerEmail("test@example.com");
+    void activateSim_shouldReturnActivation() {
+        SimRequest request = new SimRequest("1234567890", "test@example.com");
+        SimActivation expected = new SimActivation("1234567890", "test@example.com", "SUCCESS", "Activated");
 
-        mockMvc.perform(post("/api/activate")  // ensure path matches controller!
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+        when(service.activateSim(request)).thenReturn(expected);
+
+        ResponseEntity<SimActivation> response = controller.activateSim(request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+    }
+
+    @Test
+    void getAllActivations_shouldReturnList() {
+        SimActivation record1 = new SimActivation("iccid1", "email1@telstra.com", "SUCCESS", "OK");
+        SimActivation record2 = new SimActivation("iccid2", "email2@telstra.com", "FAILED", "Error");
+
+        when(repository.findAll()).thenReturn(Arrays.asList(record1, record2));
+
+        List<SimActivation> result = controller.getAllActivations();
+
+        assertEquals(2, result.size());
+        assertTrue(result.contains(record1));
+        assertTrue(result.contains(record2));
     }
 }
